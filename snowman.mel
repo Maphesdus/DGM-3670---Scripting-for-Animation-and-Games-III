@@ -1,0 +1,40 @@
+//polySphere [-axis (-ax) linear linear linear] [-caching (-cch) boolean] [-constructionHistory (-ch) boolean] [-createUVs (-cuv) int] [-name (-n) string] [-nodeState (-nds) int] [-object (-o) boolean] [-radius (-r) linear] [-subdivisionsAxis (-sa) int] [-subdivisionsHeight (-sh) int] [-subdivisionsX (-sx) int] [-subdivisionsY (-sy) int] [-texture (-tx) int]
+
+//polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+polySphere -radius 1 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
+
+//move -r 0 20 0;
+move -relative 0 20 0;
+
+//scale -r 0 0 0;
+scale -relative 0 0 0;
+
+// ------------------------------------------------------------------------------------------------------------------
+
+polySphere -radius 1.5 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
+polySphere -radius 1.3 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
+move -relative 0 2 0;
+polySphere -radius 1 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
+move -relative 0 4 0;
+
+polyCylinder -radius 1 -height 0.2;
+polyCylinder -radius .7 -height 1;
+move -relative 0 0.5 0;
+parent pCylinder2 pCylinder1;
+
+select -r pCylinder1;
+move -r 0 4.8 0;
+
+polyCone -radius 1;
+rotate -fo 0 0 -90;
+move -r 1.5 4 0;
+scale -r 0.1 1 0.1;
+rename "pCone1" "nose";
+
+select -r pCylinder1 pSphere2 pSphere3 pSphere1 pCylinder2 nose;
+doGroup 0 1 1;
+
+polyExtrudeFacet -smoothingAngle 30 pSphere3.f[200] pSphere3.f[217];
+setAttr "polyExtrudeFace1.localTranslate" -type double3 0 0 -0.2;
+
+select -clear;

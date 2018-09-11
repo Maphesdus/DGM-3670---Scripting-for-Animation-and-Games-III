@@ -1,0 +1,63 @@
+global proc string Tree() {
+	string $objects[]; // Contain list of transform objects
+	
+	polyCone -radius 1;
+	move -r 0 4 0;
+	rotate -r -os -fo 3.3 3.5 -3.0;
+	rename "pCone1" "TreeTop";	
+
+	string $sels[] = `ls -selection`; // contain list of all selections (sels)
+    $objects[0] = $sels[0];
+
+	polyCone -radius 1.5;
+	move -r 0 3 0;
+	rotate -r -os -fo 3.9 4.8 -2.7;
+	rename "pCone1" "TreeMiddle";	
+
+    $sels = `ls -selection`;
+    $objects[1] = $sels[0];
+
+	polyCone -radius 2;
+	move -r 0 2 0;
+	rotate -r -os -fo -1.6 3.0 6.3;
+	rename "pCone1" "TreeBottom";
+	
+	$sels = `ls -selection`;
+    $objects[2] = $sels[0];
+	
+    polyCylinder -radius 0.5;
+	move -r 0 1 0;
+	rotate -r -os -fo 3.0 -1.5 2.9;
+	rename "pCylinder1" "TreeTrunk";
+	
+	$sels = `ls -selection`;
+    $objects[3] = $sels[0];
+	
+
+	$objects = `polyUnite -ch 1 -mergeUVSets 1 -centerPivot -name "Tree" $objects`;
+    delete -ch $objects;
+    
+    return $objects[0];
+}
+
+global proc DuplicateTrees(int $X, float $A, float $B){
+    string $obj = `Tree`;
+    print $obj;
+    
+    for ($i = 0; $i < $X; $i++){
+        float $x = rand (-$A, $A);
+        float $y = 0;
+        float $z = rand (-$B, $B);
+        float $size = rand (0.7, 1);
+        float $rotation = rand (0, 360);
+        
+        
+        duplicate -returnRootsOnly $obj;
+        move -relative $x $y $z $obj;
+        scale -r $size $size $size $obj;
+        rotate -r -os -fo 0 $rotation 0 $obj;
+    }
+    print ("Duplicated " + $obj + " " + $X + " times!");
+}
+
+DuplicateTrees(15, 25, 30);

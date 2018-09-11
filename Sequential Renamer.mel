@@ -1,0 +1,58 @@
+/*  DGM 3670: Scripting for Games and Animation III
+	Exercise: Sequential Renamer
+    DUE: Tuesday, September 18 (9/18/2018) @ 8:30 am
+
+	Exercise:
+	Use MEL to create a tool that renames the current selections into sequential order based on a specified input.
+	 * Create a function that requires an argument string in the format "Name_#_NodeType" that will be used to specify the naming scheme.
+		For example, the argument for a leg joint chain might be named "Leg_#_Jnt".
+	 * The script will look for the "#" character and replace it with the next number in a sequence.
+	
+	Objectives:
+	 * Learn about string formatting and methods within MEL.
+	 * Practice using functions.
+	 * Familiarity with further MEL commands and flags, including rename and ls.
+	
+	Submission:
+	 * Ensure all work is saved to Github. Submit the MEL file and a link to the Github file.
+*/
+
+// For input, get the object name as a string.
+// Example: name_#_nodeType
+
+// Parse the string and split it into multiple parts.
+
+// Assign "name" to a variable.
+// Assign "#" to a variable.
+// Assign "nodeType" to a variable.
+
+string name;
+int number;
+nodeType node;
+
+
+// Create a selection array.
+string $sels[] = `ls -selection`;
+
+// Loop through the selection array.
+
+
+// Concatenate the strings (add multiple strings together) by incrementing the number.
+
+// Count the number of digits in number part of the object's name.
+
+// Rename the currently selected object.
+
+/* Important commands for this assignment:
+     * tokenize <-- Highly recommended!!!
+     * startsWith
+     * endsWith
+     * compare
+     * match
+     * strip
+     * substitute
+     * substring
+*/
+
+
+
