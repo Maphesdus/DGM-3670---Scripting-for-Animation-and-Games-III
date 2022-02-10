@@ -1,0 +1,30 @@
+// snowballs:
+polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+move -y 1;
+polySphere -r .7 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+move -y 2.2;
+polySphere -r .45 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+move -y 3.1;
+
+// hat:
+polyCylinder -r .5 -h .1 -sx 20 -sy 1 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 -ch 1;
+move -y 3.5;
+polyCylinder -r .3 -h .5 -sx 20 -sy 1 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 -ch 1;
+move -y 3.7;
+
+// carrot:
+polyCone -r .1 -h 1 -sx 20 -sy 1 -sz 0 -ax 90 1 0 -rcp 0 -cuv 3 -ch 1;
+rotate -r -os -fo 0 -180 0 ;
+move -r -.5 3.2 0 ;
+
+// arms:
+polyCylinder -r .05 -h 2 -sx 20 -sy 1 -sz 1 -ax 0 0 1 -rcp 0 -cuv 3 -ch 1;
+move -r 0 2.5 -1;
+polyCylinder -r .05 -h 2 -sx 20 -sy 1 -sz 1 -ax 0 0 1 -rcp 0 -cuv 3 -ch 1;
+move -r 0 2.5 1;
+
+// eyes:
+polySphere -r .05 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+move -.4 3.3 -.15;
+polySphere -r .05 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
+move -.4 3.3 .15;
