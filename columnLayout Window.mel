@@ -1,0 +1,75 @@
+//window -title "toolbox" "myWindow";
+
+string $mainWindow = "Main Window";
+if (`window -exists $mainWindow`){ deleteUI $mainWindow; }
+$mainWindow = `window -title "toolbox" $mainWindow`;
+
+window;
+//columnLayout -parent $mainWindow -columnAttach "both" 5 -rowSpacing 10 -columnWidth 250;
+string $mColumn = `columnLayout -parent $mainWindow -columnAttach "both" 5 -rowSpacing 10 -columnWidth 250`;
+button -parent $mColumn -label "Parent Group" -command parentGroup(/"insert text here/")";
+button -parent $mColumn -label "Create Controls -command "createCtrls()";
+button -parent $mColumn -label "Other Stuff";
+
+floatField;
+floatField -editable false;
+floatField -minValue -10 -maxValue 10 -value 0;
+floatField -minValue 0 -maxValue 1 -precision 2;
+floatField -minValue -1 -maxValue 1 -precision 4 -step .01;
+
+
+
+
+global proc FloatFieldQueary(string $controlName, string $attr){
+	float $value = `floatField -q ("_" + $attr) $controlName`;
+	return $value;
+}
+
+
+string $mainWindow = "RandomPlacementWindow";
+
+if (window -exists $mainWindow){
+	deleteUI $mainWindow;
+}
+
+$mainWindow = `window -title "Random Placement Window" $mainWindow`;
+string $mainCol = `columnLayout -parent $mainWindow -adjustableColumn 1`;
+
+// Create first row for duplicate fields:
+string $dupRowLayout = `rowLayout -parent $mainCol -numberOfColumns 2 -adjustableColumn 2`;
+text -parent $dupRowLayout -label "Duplicate";
+string $dupIntField = `intField -parent $dupRowLayout -minValue 1 -value 7`;
+
+// create second row for range values:
+string $rangeRowLayout = `rowLayout -parent $mainCol -numberOfColumns 4`;
+text -parent $rangeRowLayout -label "Range";
+string $xRange = `floatField -parent $rangeRowLayout -value 0`;
+string $yRange = `floatField -parent $rangeRowLayout -value 0`;
+string $zRange = `floatField -parent $rangeRowLayout -value 0`;
+
+// create a button:
+string $button = `-parent $mainCol -label "Generate" -command MoveObj($xRange, $yRange, $zRange)`;
+
+
+"MoveObj(\"" + $xRange + "\", \"" + $yRange\", \"" + $zRange + "\")"
+
+
+// Get Float Field Value
+global proc float GetFloatFieldValue(string $control){
+	float $value = `floatField -q -value $control`;
+	return $value;
+}
+
+
+// Move Object
+global proc MoveObj(string $xName, string $yName, string $zName){
+	string $sels[] = `ls -selection`;
+	
+	float $xVal = `GetFloatFieldValue($xName)`;
+	float $yVal = `GetFloatFieldValue($yName)`;
+	float $zVal = `GetFloatFieldValue($zName)`;
+	
+	move $xVal $yVal $zVal $sels[0];
+}
+
+showWindow "myWindow";

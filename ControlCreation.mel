@@ -1,0 +1,73 @@
+// Color Controls (sets color index of the control):
+global proc ColorControls(string $ctrl, int $colorIndex) {
+    string $shapes[]; // Define string array for shapes.
+    $shapes = `listRelatives -shapes $ctrl`; // Find the shape node(s) of $ctrl.
+
+    for ($shape in $shapes) {
+        // Check for nurbsCurve:
+        if (`nodeType $shape` == "nurbsCurve") {            
+			listRelatives -allDescendents;
+		
+            setAttr ($shape + ".overrideEnabled") 1; // Enable override on $shape.
+            setAttr ($shape + ".overrideColor") $colorIndex; // Set $shape color to $color.
+        } 
+
+        else  {
+            warning("Selected object is not a curve.");
+        }
+    }
+}
+
+// Create Circle Controls:
+global proc CreateCircleCtrls(int $color) {
+    string $sels[] = `ls -selection`;
+    int $selsSize = size($sels);
+    
+    if ($selsSize > 0){
+        for($i = 0; $i < $selsSize; $i++){
+            string $ctrlName = ($sels[$i] + "_Ctrl");
+            string $ctrl[] = `circle -center 0 0 0 -normal 0 1 0 -name $ctrlName`;
+            matchTransform $ctrl $sels[$i];
+            scale -relative 2 1 2;
+            ColorControls($ctrlName, $color);
+        }
+    }
+    
+    else {
+        string $ctrlName = "Ctrl";
+        circle -center 0 0 0 -normal 0 1 0 -name $ctrlName;
+        scale -relative 2 1 2;
+        ColorControls($ctrlName, $color);
+    }
+}
+
+// Create Square Controls:
+global proc CreateSquareCtrls(int $color) {
+    string $sels[] = `ls -selection`;
+    int $selsSize = size($sels);
+    
+    if ($selsSize > 0){
+        for($i = 0; $i < $selsSize; $i++){
+            string $ctrlName = ($sels[$i] + "_Ctrl");
+            string $ctrl[] = `nurbsSquare -center 0 0 0 -normal 0 1 0 -name $ctrlName`;
+            matchTransform $ctrl $sels[$i];
+            scale -relative 2 1 2;
+            ColorControls($ctrlName, $color);
+        }
+    }
+    
+    else {
+        string $ctrlName = "Ctrl";
+        nurbsSquare -center 0 0 0 -normal 0 1 0 -name $ctrlName;
+        scale -relative 2 1 2;
+        ColorControls($ctrlName, $color);
+    }
+}
+
+global proc float GetFloatFieldValue(string $control){
+	float $value = `floatField -q -value $control`;
+	return $value;
+}
+
+CreateCircleCtrls(13);
+CreateSquareCtrls(13);

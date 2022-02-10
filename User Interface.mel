@@ -1,0 +1,393 @@
+global proc UserInterfaceWindow(){
+	string $mainWindow = "User Interface Window";
+
+	if (`window -exists $mainWindow`){
+		deleteUI "$mainWindow";
+	}
+	
+	$mainWindow = `window -title "User Interface Window" $mainWindow`;
+	string $mainCol = `columnLayout -adjustableColumn 1 -parent $mainWindow`;
+		
+	// create first row for Random Tree Placement:
+	string $treeRowLayout = `rowLayout -parent $mainCol -numberOfColumns 5`;
+	text -parent $treeRowLayout -label "Random Tree Placer: ";
+	string $xRange = `intField -parent $treeRowLayout -value 15`;
+	string $yRange = `intField -parent $treeRowLayout -value 25`;
+	string $zRange = `intField -parent $treeRowLayout -value 30`;	
+	button -parent $treeRowLayout -label "Place Trees" -command "DuplicateTrees($xRange, $yRange, $zRange)";
+	
+	// Create second row for Sequential Renamer:
+	string $nameRowLayout = `rowLayout -parent $mainCol -numberOfColumns 3 -adjustableColumn 2`;
+	text -parent $nameRowLayout -label "Sequential Renamer: ";
+	string $nameTextField = `textField -parent $nameRowLayout -placeholderText "New Object Name"`;	
+	button -parent $nameRowLayout -label "Rename Selected Objects" -command "SequentialRenamer($nameTextField)";
+	
+	// Create third row for Circle Control:
+	string $circleRowLayout = `rowLayout -parent $mainCol -numberOfColumns 3 -adjustableColumn 2`;
+	text -parent $circleRowLayout -label "Color Index: ";
+	string $circleIntField = `intField -parent $circleRowLayout -value 13`;	
+	button -parent $circleRowLayout -label "Create Circle Controls" -command "CreateCircleCtrls($circleIntField)";
+	
+	// Create third row for Square Control:
+	string $squareRowLayout = `rowLayout -parent $mainCol -numberOfColumns 3 -adjustableColumn 2`;
+	text -parent $squareRowLayout -label "Color Index: ";
+	string $squareIntField = `intField -parent $squareRowLayout -value 13`;	
+	button -parent $squareRowLayout -label "Create Square Controls" -command "CreateSquareCtrls($circleIntField)";
+	
+	
+	// Create forth row:
+	string $newRowLayout = `rowLayout -parent $mainCol -numberOfColumns 4`;
+	
+	button -parent $newRowLayout -label "Place Random Trees" -command "DuplicateTrees(15, 25, 30)";
+	button -parent $newRowLayout -label "Sequential Renamer" -command "SequentialRenamer(\"Leg\")";
+	button -parent $newRowLayout -label "Create Circle Controls" -command "CreateCircleCtrls(13)";
+	button -parent $newRowLayout -label "Create Square Controls" -command "CreateSquareCtrls(13)";
+	
+	showWindow $mainWindow;
+}
+
+global proc string Tree() {
+	string $objects[]; // Contain list of transform objects
+	
+	polyCone -radius 1;
+	move -r 0 4 0;
+	rotate -r -os -fo 3.3 3.5 -3.0;
+	rename "pCone1" "TreeTop";	
+
+	string $sels[] = `ls -selection`; // contain list of all selections (sels)
+    $objects[0] = $sels[0];
+
+	polyCone -radius 1.5;
+	move -r 0 3 0;
+	rotate -r -os -fo 3.9 4.8 -2.7;
+	rename "pCone1" "TreeMiddle";	
+
+    $sels = `ls -selection`;
+    $objects[1] = $sels[0];
+
+	polyCone -radius 2;
+	move -r 0 2 0;
+	rotate -r -os -fo -1.6 3.0 6.3;
+	rename "pCone1" "TreeBottom";
+	
+	$sels = `ls -selection`;
+    $objects[2] = $sels[0];
+	
+    polyCylinder -radius 0.5;
+	move -r 0 1 0;
+	rotate -r -os -fo 3.0 -1.5 2.9;
+	rename "pCylinder1" "TreeTrunk";
+	
+	$sels = `ls -selection`;
+    $objects[3] = $sels[0];
+	
+
+	$objects = `polyUnite -ch 1 -mergeUVSets 1 -centerPivot -name "Tree" $objects`;
+    delete -ch $objects;
+    
+    return $objects[0];
+}
+
+global proc DuplicateTrees(int $X, float $A, float $B){
+    string $obj = `Tree`;
+    print $obj;
+    
+    for ($i = 0; $i < $X; $i++){
+        float $x = rand (-$A, $A);
+        float $y = 0;
+        float $z = rand (-$B, $B);
+        float $size = rand (0.7, 1);
+        float $rotation = rand (0, 360);
+        
+        
+        duplicate -returnRootsOnly $obj;
+        move -relative $x $y $z $obj;
+        scale -r $size $size $size $obj;
+        rotate -r -os -fo 0 $rotation 0 $obj;
+    }
+    print ("Duplicated " + $obj + " " + $X + " times!");
+}
+global proc SequentialRenamer(string $input) {
+    // Create a selection array from all currently selected objects:
+    string $sels[] = `ls -selection`;
+    
+    // Save the name of the selected object(s) as a string:
+    string $nName = $sels[0];
+    
+    // Count the number of selected objects:
+    int $selsSize = size($sels);
+    print ("Number of nodes selected: " + $selsSize + "\n\n");
+    
+    // Save the number of selected objects as an integer:
+    int $nNumber = $selsSize;
+    
+    // Get the type of node for the object selected:
+    string $nType = `nodeType $sels[0]`;
+    
+    // Print a table header:
+    print ("Name: \t#: \tType: \tNew Name:\n");
+    
+    // Loop through all objects:
+    for($i = 0; $i < $selsSize; $i++) {
+        $nName = $sels[$i];
+        $nNumber = $i + 1;
+        $nType = `nodeType $sels[$i]`;
+        
+        print ($nName + "\t");
+        print ($nNumber + "\t");
+        print ($nType + "\t");
+        
+        $nName = $input;
+        
+        string $newName = ($nName + "_" + $nNumber + "_" + $nType);
+        //string $newLine = stringArrayToString($sels, ",");
+    
+        
+        print ($newName + "\n");
+        rename $sels[$i] $newName;
+    } // END for loop
+} // END SequentialRenamer()
+
+// Color Controls (sets color index of the control):
+global proc ColorControls(string $ctrl, int $colorIndex) {
+    string $shapes[]; // Define string array for shapes.
+    $shapes = `listRelatives -shapes $ctrl`; // Find the shape node(s) of $ctrl.
+
+    for ($shape in $shapes) {
+        // Check for nurbsCurve:
+        if (`nodeType $shape` == "nurbsCurve") {            
+			listRelatives -allDescendents;
+		
+            setAttr ($shape + ".overrideEnabled") 1; // Enable override on $shape.
+            setAttr ($shape + ".overrideColor") $colorIndex; // Set $shape color to $color.
+        } 
+
+        else  {
+            warning("Selected object is not a curve.");
+        }
+    }
+}
+
+// Create Circle Controls:
+global proc CreateCircleCtrls(int $color) {
+    string $sels[] = `ls -selection`;
+    int $selsSize = size($sels);
+    
+    if ($selsSize > 0){
+        for($i = 0; $i < $selsSize; $i++){
+            string $ctrlName = ($sels[$i] + "_Ctrl");
+            string $ctrl[] = `circle -center 0 0 0 -normal 0 1 0 -name $ctrlName`;
+            matchTransform $ctrl $sels[$i];
+            scale -relative 2 1 2;
+            ColorControls($ctrlName, $color);
+        }
+    }
+    
+    else {
+        string $ctrlName = "Ctrl";
+        circle -center 0 0 0 -normal 0 1 0 -name $ctrlName;
+        scale -relative 2 1 2;
+        ColorControls($ctrlName, $color);
+    }
+}
+
+// Create Square Controls:
+global proc CreateSquareCtrls(int $color) {
+    string $sels[] = `ls -selection`;
+    int $selsSize = size($sels);
+    
+    if ($selsSize > 0){
+        for($i = 0; $i < $selsSize; $i++){
+            string $ctrlName = ($sels[$i] + "_Ctrl");
+            string $ctrl[] = `nurbsSquare -center 0 0 0 -normal 0 1 0 -name $ctrlName`;
+            matchTransform $ctrl $sels[$i];
+            scale -relative 2 1 2;
+            ColorControls($ctrlName, $color);
+        }
+    }
+    
+    else {
+        string $ctrlName = "Ctrl";
+        nurbsSquare -center 0 0 0 -normal 0 1 0 -name $ctrlName;
+        scale -relative 2 1 2;
+        ColorControls($ctrlName, $color);
+    }
+}
+
+global proc float GetFloatFieldValue(string $control){
+	float $value = `floatField -q -value $control`;
+	return $value;
+}global proc string Tree() {
+	string $objects[]; // Contain list of transform objects
+	
+	polyCone -radius 1;
+	move -r 0 4 0;
+	rotate -r -os -fo 3.3 3.5 -3.0;
+	rename "pCone1" "TreeTop";	
+
+	string $sels[] = `ls -selection`; // contain list of all selections (sels)
+    $objects[0] = $sels[0];
+
+	polyCone -radius 1.5;
+	move -r 0 3 0;
+	rotate -r -os -fo 3.9 4.8 -2.7;
+	rename "pCone1" "TreeMiddle";	
+
+    $sels = `ls -selection`;
+    $objects[1] = $sels[0];
+
+	polyCone -radius 2;
+	move -r 0 2 0;
+	rotate -r -os -fo -1.6 3.0 6.3;
+	rename "pCone1" "TreeBottom";
+	
+	$sels = `ls -selection`;
+    $objects[2] = $sels[0];
+	
+    polyCylinder -radius 0.5;
+	move -r 0 1 0;
+	rotate -r -os -fo 3.0 -1.5 2.9;
+	rename "pCylinder1" "TreeTrunk";
+	
+	$sels = `ls -selection`;
+    $objects[3] = $sels[0];
+	
+
+	$objects = `polyUnite -ch 1 -mergeUVSets 1 -centerPivot -name "Tree" $objects`;
+    delete -ch $objects;
+    
+    return $objects[0];
+}
+
+global proc DuplicateTrees(int $X, float $A, float $B){
+    string $obj = `Tree`;
+    print $obj;
+    
+    for ($i = 0; $i < $X; $i++){
+        float $x = rand (-$A, $A);
+        float $y = 0;
+        float $z = rand (-$B, $B);
+        float $size = rand (0.7, 1);
+        float $rotation = rand (0, 360);
+        
+        
+        duplicate -returnRootsOnly $obj;
+        move -relative $x $y $z $obj;
+        scale -r $size $size $size $obj;
+        rotate -r -os -fo 0 $rotation 0 $obj;
+    }
+    print ("Duplicated " + $obj + " " + $X + " times!");
+}
+global proc SequentialRenamer(string $input) {
+    // Create a selection array from all currently selected objects:
+    string $sels[] = `ls -selection`;
+    
+    // Save the name of the selected object(s) as a string:
+    string $nName = $sels[0];
+    
+    // Count the number of selected objects:
+    int $selsSize = size($sels);
+    print ("Number of nodes selected: " + $selsSize + "\n\n");
+    
+    // Save the number of selected objects as an integer:
+    int $nNumber = $selsSize;
+    
+    // Get the type of node for the object selected:
+    string $nType = `nodeType $sels[0]`;
+    
+    // Print a table header:
+    print ("Name: \t#: \tType: \tNew Name:\n");
+    
+    // Loop through all objects:
+    for($i = 0; $i < $selsSize; $i++) {
+        $nName = $sels[$i];
+        $nNumber = $i + 1;
+        $nType = `nodeType $sels[$i]`;
+        
+        print ($nName + "\t");
+        print ($nNumber + "\t");
+        print ($nType + "\t");
+        
+        $nName = $input;
+        
+        string $newName = ($nName + "_" + $nNumber + "_" + $nType);
+        //string $newLine = stringArrayToString($sels, ",");
+    
+        
+        print ($newName + "\n");
+        rename $sels[$i] $newName;
+    } // END for loop
+} // END SequentialRenamer()
+
+// Color Controls (sets color index of the control):
+global proc ColorControls(string $ctrl, int $colorIndex) {
+    string $shapes[]; // Define string array for shapes.
+    $shapes = `listRelatives -shapes $ctrl`; // Find the shape node(s) of $ctrl.
+
+    for ($shape in $shapes) {
+        // Check for nurbsCurve:
+        if (`nodeType $shape` == "nurbsCurve") {            
+			listRelatives -allDescendents;
+		
+            setAttr ($shape + ".overrideEnabled") 1; // Enable override on $shape.
+            setAttr ($shape + ".overrideColor") $colorIndex; // Set $shape color to $color.
+        } 
+
+        else  {
+            warning("Selected object is not a curve.");
+        }
+    }
+}
+
+// Create Circle Controls:
+global proc CreateCircleCtrls(int $color) {
+    string $sels[] = `ls -selection`;
+    int $selsSize = size($sels);
+    
+    if ($selsSize > 0){
+        for($i = 0; $i < $selsSize; $i++){
+            string $ctrlName = ($sels[$i] + "_Ctrl");
+            string $ctrl[] = `circle -center 0 0 0 -normal 0 1 0 -name $ctrlName`;
+            matchTransform $ctrl $sels[$i];
+            scale -relative 2 1 2;
+            ColorControls($ctrlName, $color);
+        }
+    }
+    
+    else {
+        string $ctrlName = "Ctrl";
+        circle -center 0 0 0 -normal 0 1 0 -name $ctrlName;
+        scale -relative 2 1 2;
+        ColorControls($ctrlName, $color);
+    }
+}
+
+// Create Square Controls:
+global proc CreateSquareCtrls(int $color) {
+    string $sels[] = `ls -selection`;
+    int $selsSize = size($sels);
+    
+    if ($selsSize > 0){
+        for($i = 0; $i < $selsSize; $i++){
+            string $ctrlName = ($sels[$i] + "_Ctrl");
+            string $ctrl[] = `nurbsSquare -center 0 0 0 -normal 0 1 0 -name $ctrlName`;
+            matchTransform $ctrl $sels[$i];
+            scale -relative 2 1 2;
+            ColorControls($ctrlName, $color);
+        }
+    }
+    
+    else {
+        string $ctrlName = "Ctrl";
+        nurbsSquare -center 0 0 0 -normal 0 1 0 -name $ctrlName;
+        scale -relative 2 1 2;
+        ColorControls($ctrlName, $color);
+    }
+}
+
+global proc float GetFloatFieldValue(string $control){
+	float $value = `floatField -q -value $control`;
+	return $value;
+}
+
+UserInterfaceWindow();

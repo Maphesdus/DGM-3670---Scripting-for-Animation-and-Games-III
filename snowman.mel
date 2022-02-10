@@ -1,16 +1,3 @@
-//polySphere [-axis (-ax) linear linear linear] [-caching (-cch) boolean] [-constructionHistory (-ch) boolean] [-createUVs (-cuv) int] [-name (-n) string] [-nodeState (-nds) int] [-object (-o) boolean] [-radius (-r) linear] [-subdivisionsAxis (-sa) int] [-subdivisionsHeight (-sh) int] [-subdivisionsX (-sx) int] [-subdivisionsY (-sy) int] [-texture (-tx) int]
-
-//polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1;
-polySphere -radius 1 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
-
-//move -r 0 20 0;
-move -relative 0 20 0;
-
-//scale -r 0 0 0;
-scale -relative 0 0 0;
-
-// ------------------------------------------------------------------------------------------------------------------
-
 polySphere -radius 1.5 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
 polySphere -radius 1.3 -subdivisionsX 20 -subdivisionsY 20 -axis 0 1 0 -createUVs 2 -constructionHistory 1;
 move -relative 0 2 0;

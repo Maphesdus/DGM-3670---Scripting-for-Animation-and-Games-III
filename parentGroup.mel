@@ -1,0 +1,49 @@
+// Create control:
+listRelatives -parent; // returns parent node
+
+// Create group & match xforms:
+if (parent exists){
+	// parent group under parent node
+}
+
+else {
+	// parent under world
+}
+
+
+// parentGroup procedure:
+global proc parentGroup(){
+	string $sel[] = `ls -sl`;
+	
+	// Check to see whether each selection in the group has a parent or not:
+	for ($sel in $sels){
+		string $parent[] = `listRelatives - parent -fullpath $sel`;
+		
+		if($parent > 0){
+			// In Python, the command "if ($variable)" executes if the variable contains data.
+			// In MEL, however, we have to write "if ($parent > 0)".
+			print ("I have a daddy!");
+		}
+		
+		else {
+			print ("I'm an orphan...");
+		}
+	}
+	
+	// Parent each selection into a new hierarchy:
+	for ($sel in $sels){
+		string $parent[] = `listRelatives - parent -fullpath $sel`;
+		
+		string $grp[] = `group -empty -name ($sel + "_Grp")`;
+		matchTransform $grp $sel;
+		parent $sel $grp;		
+
+		if($parent > 0){
+			print ($grp + "_" + $parent[0]):
+			parent $grp $parent[0];
+		}
+	}
+} // END parentGroup procedure
+
+
+parentGroup();

@@ -1,0 +1,55 @@
+string $newName = "GoodbyeWorld";
+string $text = "Hi Friend";
+
+
+global proc Renamer(string $name){
+	string $sels[] = `ls -sl`;
+	for ($i=0; $i<size($sels); $i++){
+		string $newName = ($name + "_" + $i+1);
+		rename $sels[$i] $newName;
+	}
+}
+
+global proc Toolbox(){
+	string $mWindow = "ToolboxWindow";
+	
+	if (`window -exists $mWindow`){
+		deleteUI $mWindow;
+	}
+	
+	$mWindow = `window -title "Renamer" $mWindow`;
+	string $mCol = `columnLayout -adjustableColumn 1`;
+	button -label "Renamer" -c RenamerUI;
+	
+	showWindow $mWindow;
+}
+
+global proc RenamerUI(){
+	string $mWindow = "RenamerWindow";
+	
+	if (`window -exists $mWindow`){
+		deleteUI $mWindow;
+	}
+	
+	$mWindow = `window -title "Renamer" $mWindow`;
+	string $mCol = `columnLayout -adjustableColumn 1`;
+	text -label "Enter new name:";
+	string $nameField = `textField -placeholderText "Enter new name"`;
+	textField -e -enterCommand ("RunRenamer(\"" + $nameField + "\")") $nameField;
+	button -label "Rename" -c ("RunRenamer(\"" + $nameField + "\")") $nameField;
+	
+	showWindow $mWindow;
+}
+
+
+global proc string GetTextFieldValue(string $control){
+	string $value = `textField -q -text $control`;
+	return $value;
+}
+
+global proc RunRenamer(string $control){
+	string $name = `GetTextFieldValue($control)`;
+	Renamer($name);
+}
+
+Toolbox();

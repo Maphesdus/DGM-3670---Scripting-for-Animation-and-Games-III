@@ -1,0 +1,55 @@
+// Use MEL to create a function that builds a locator at the center of the current selection(s). Use parameters and arguments to modify and accomplish specific functionality as outlined below.
+
+// Create a locator at the combined center of all selected objects.
+// Create a locator at the center of each individual selection. This includes objects as well as components, joints, clusters, etc.
+// Inlude an optional parameter to match the locator orientation to the respective selection.
+
+// Objectives:
+//  * Familiarity with the xform and spaceLocator commands.
+//  * Familiarity and differences between world space and relative space.
+//  * Continued used of functions and parameters.
+//  * Problem-solving unique coding solutions to a visual process.
+
+
+//Select obj
+
+global proc string CreateLocator() {
+	//$var <- `ls-sl`
+	string $sels[] = `ls -sl`; // assign selection to an array
+	string $temp[] = `duplicate -rr $sels`; // duplicating the selection as a temp object and assigning to new array
+	
+	// Checking whether ,more than one object is selected
+	// if yes, combine to a single object for the bounding box query
+	if (size($temp) > 1)
+		$temp = `polyUnite $temp`; // combine geo into one object
+	
+	float $bbPos[]; // query the bounding box min and max values for the temp object and assign to float array
+	$bbPos = `xform -q -boundingBox $temp`; // delete the history of the temp object
+	print (`$bbPos`);
+	delete -constructionHistory $temp; // delete the temp object
+	delete $temp;
+	
+	// find the center of x, y, and z coordinates of the bouding box
+	float $xPos, $yPos, $zPos;
+	$xPos = ($bbPos[0] + $bbPos[3]) / 2;
+	$yPos = ($bbPos[1] + $bbPos[4]) / 2;
+	$zPos = ($bbPos[2] + $bbPos[5]) / 2;	
+	
+	string $loc[] = `spaceLocator -name "TempLocator" -position 0 0 0`;	// create a locator at 0, 0, 0	
+	xform -translation $xPos $yPos $zPos -worldSpace -absolute $loc[0]; // move the locator to world space position of the center of the bounding box calculated before.
+	
+	return $loc[0]; // Return the locator name.
+	
+	//print (`xform -q -boundingBox $sels`);
+	
+	// AverageTransforms
+	// Group/CenterPivot/Cluster/FindPOS
+	// Find combined center x, y, z coord
+	// Create locator - spaceLocator
+	// moveLocator - xform
+}
+
+CenterLocator();
+
+// Command to run a named script from Maya's scripts folder:
+source ScriptName;

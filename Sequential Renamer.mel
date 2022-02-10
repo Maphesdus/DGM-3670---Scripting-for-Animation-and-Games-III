@@ -1,20 +1,6 @@
 /*  DGM 3670: Scripting for Games and Animation III
-	Exercise: Sequential Renamer
-    DUE: Tuesday, September 18 (9/18/2018) @ 8:30 am
+    DUE: Tuesday, September 18 (9/18/2018)
 
-	Exercise:
-	Use MEL to create a tool that renames the current selections into sequential order based on a specified input.
-	 * Create a function that requires an argument string in the format "Name_#_NodeType" that will be used to specify the naming scheme.
-		For example, the argument for a leg joint chain might be named "Leg_#_Jnt".
-	 * The script will look for the "#" character and replace it with the next number in a sequence.
-	
-	Objectives:
-	 * Learn about string formatting and methods within MEL.
-	 * Practice using functions.
-	 * Familiarity with further MEL commands and flags, including rename and ls.
-	
-	Submission:
-	 * Ensure all work is saved to Github. Submit the MEL file and a link to the Github file.
 */
 
 // For input, get the object name as a string.
@@ -26,15 +12,53 @@
 // Assign "#" to a variable.
 // Assign "nodeType" to a variable.
 
-string name;
-int number;
-nodeType node;
+string $name;
+int $number;
+nodeType $node;
+
+/*	The ls command returns the names (and optionally the type names) of objects in the scene.
+	The most common use of ls is to filter or match objects based on their name (using wildcards) or based on their type.
+	By default ls will match any object in the scene but it can also be used to filter or list the selected objects when used in conjunction with the -selection flag.
+
+	If type names are requested, using the showType flag, they will be interleaved with object names so the result will be pairs of <object, type> values.
+
+	Internal nodes (for example itemFilter nodes) are typically filtered so that only scene objects are returned.
+	However, using a wildcard will cause all the nodes matching the wild card to show up, including internal nodes.
+	For example, ls * will list all nodes whether internal or not.
+
+	Use the syntax "::" to denote a recursive namespace search when listing nodes.
+	For example, ls "::pSphere1" would match objects named "pSphere1" in any namespace, at any depth.
+	ls "ns::*" would match any node in namespace "ns" or children namespaces.
+
+	When Maya is in relativeNames mode, the ls command will return names relative to the current namespace and ls * will list from the the current namespace.
+	For more details, please refer to the -relativeNames flag of the namespace command.
+
+	The command may also be passed node UUIDs instead of names/paths, and can return UUIDs instead of names via the -uuid flag.
+	
+	string $sels[] = `ls -selection`;
+		-selection (-sl)
+*/
 
 
 // Create a selection array.
 string $sels[] = `ls -selection`;
 
 // Loop through the selection array.
+for ($i = 0; $i < $X; $i++){
+
+}
+
+// http://wiki.bk.tudelft.nl/toi-pedia/MEL_-_Writing_simple_tools
+
+
+string $selection[] = `ls -selection -long`;
+print $selection[0]; //the first selected object
+ 
+/* loop through all objects */
+string $object;
+for ( $object in $selection ) {
+  delete $object; // a quite destructive example, deleting the object
+}
 
 
 // Concatenate the strings (add multiple strings together) by incrementing the number.
@@ -44,7 +68,7 @@ string $sels[] = `ls -selection`;
 // Rename the currently selected object.
 
 /* Important commands for this assignment:
-     * tokenize <-- Highly recommended!!!
+     * tokenize <-- Highly recommended!!! http://help.autodesk.com/view/MAYAUL/2018/ENU/?guid=__Commands_tokenize_html
      * startsWith
      * endsWith
      * compare
@@ -53,6 +77,35 @@ string $sels[] = `ls -selection`;
      * substitute
      * substring
 */
+
+
+
+
+// For input, get the object name as a string.
+// Example: name_#_nodeType
+string $sels[] = `ls -sl`;
+string $nodeName = $sels[0];
+print $nodeName;
+//int $number;
+//nodeType $node;
+
+//$sels = `ls -selection -long`;
+//$nodName = $sels[0];
+//print $nodeName;
+
+// Parse the string and split it into multiple parts.
+
+// Assign "name" to a variable.
+// Assign "#" to a variable.
+// Assign "nodeType" to a variable.
+
+//string $graphAttr;
+//$graphAttr = $nodeSelect[0] + "_translateZ";
+//print $graphAttr;
+//print ("\n");
+//print $nodeSelect[0];
+//-----------------------------------------------
+
 
 
 

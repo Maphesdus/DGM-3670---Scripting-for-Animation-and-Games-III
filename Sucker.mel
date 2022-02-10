@@ -1,0 +1,62 @@
+global proc string Sucker() {
+    //string $stickyPart[] = `polySphere -r 1 -sx 20 - sy 20 -ax 0 1 0 -cuv 2 -ch 1`;
+    //string $stick = `polyCylinder -r .1 -h 5 -sx 20 -sy 1 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 - ch 1`;
+    
+    string $objects[]; // Contain list of transform objects
+    
+    polySphere -r 1 -sx 20 - sy 20 -ax 0 1 0 -cuv 2 -ch 1 -name "topPart";
+    string $sels[] = `ls -selection`; // contain list of all selections (sels)
+    $objects[0] = $sels[0];
+    
+    polyCylinder -r .1 -h 5 -sx 20 -sy 1 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 - ch 1 - name "bottomPart";
+    $sels = `ls -selection`; // contain list of all selections (sels)
+    $objects[1] = $sels[0];      
+      
+    move -r -os -wd 0 5.0 0 $objects[0];    
+    move -r -os -wd 0 2.5 0 $objects[1];
+      
+    //print($stickyPart)
+    //move -r -os -wd 0 5.0 0 $stickyPart[0];    
+    //move -r -os -wd 0 2.5 0 $stick[0];
+    
+    
+    /* move    
+        Long name (short name)    Argument types    Argument types    Description:
+        -relative(-r)             N/A               create            Perform a operation relative to the object's current position
+        -objectSpace(-os)         N/A               create            Move in object space
+        -worldSpaceDistance(-wd)  N/A		          create            Move is specified in world space units
+    */
+    
+    $objects = `polyUnite -ch 1 -mergeUVSets 1 -centerPivot -name "Sucker" $objects`;
+    delete -ch $objects;
+    
+    return $objects[0];
+}
+
+
+
+/*  duplicate
+    -returnRootsOnly(-rr)
+        Return only the root nodes of the new hierarchy.
+        When used with upstreamNodes flag, the upstream nodes will be omitted in the result.
+        This flag controls only what is returned in the output string[], and it does NOT change the behaviour of the duplicate command.
+*/
+
+
+global proc DuplicateSuckers(){
+    string $obj = `Sucker`;
+    print $obj;
+    int $randNum = rand (1, 100);
+    
+    for ($i = 0; $i < $randNum; $i++){        
+        float $x = rand (-1, 1);
+        float $y = 0;
+        float $z = rand (-1, 1);
+        
+        duplicate -returnRootsOnly $obj;
+        move -relative $x $y $z $obj;
+    }
+    print ("Duplicated " + $obj + " " + $randNum + " times!");
+}
+
+DuplicateSuckers();
